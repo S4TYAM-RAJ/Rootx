@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ROOTX FREE TOOLS</title>
+  <style>
+    body {
+      background: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 10px;
+      text-align: center;
+      color: #000;
+    }
+
+    p.intro {
+      text-align: center;
+      color: #444;
+      margin-bottom: 20px;
+    }
+
+    .tool {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      word-break: break-word;
+    }
+
+    .tool span {
+      font-size: 14px;
+      font-weight: bold;
+      color: #000;
+      max-width: 70%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      background: #007BFF;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    .btn:hover { background: #0056b3; }
+
+    .btn.premium {
+      background: #888;
+      cursor: not-allowed;
+    }
+
+    footer {
+      margin: 30px 0;
+      font-size: 16px;
+      font-weight: bold;
+      color: #000;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>ROOTX FREE TOOLS</h1>
+  <p class="intro">Made by hunders but only provided in one place by Rootx</p>
+
+  <div id="toolsList"></div>
+
+  <footer>TEAM ROOTX PAY 9679145745@fam FOR PREMIUM</footer>
+
+  <script>
+    const tools = [
+      { name: "Anonymous Chatting", url: "https://www.mediafire.com/file/aeu3brgjkn8le1h/Anonymous_chatting_2.0_1.1.apk/file" },
+      { name: "Droidsheep", url: "https://www.mediafire.com/file/11adeyhu9zowa54/droidsheep.apk.zip/file" },
+      { name: "MT Manager", url: "https://www.mediafire.com/file/8m5xw8nv48iutaw/MT_Manager_Full_Vip_Features.7z/file" },
+      { name: "YouTube Pro", url: "https://www.mediafire.com/file/ym821w6q4zpnw74/YouTube+Pro_3.87.apk/file" },
+      { name: "NetMirrorTV", url: "https://www.mediafire.com/file/v6322h9j0dvp86z/NetMirrorTV_1.0.apk/file" },
+      { name: "FakeBank", url: "https://www.mediafire.com/file/w763gn81iiw65rr/FakeBank.apk/file" },
+      { name: "Mix ChatGPT ", url: "https://www.mediafire.com/file/gibbxsll0ouc953/chatgpt.apk/file" },
+      { name: "Prediction Hack", url: "https://www.mediafire.com/file/n2twys0vtfy8pbh/Prediction+Server+Hack.apk/file" },
+      { name: "Fake Fampay", url: "https://www.mediafire.com/file/hrl2iknakzws3cr/FamApp.apk/file" },
+      { name: "Followers Tool", url: "https://www.mediafire.com/file/pu1fkm72i1e04bw/Free+Followers_1.0.apk/file" },
+      { name: "Gmail Password", url: "" } // blank premium entry
+    ];
+
+    const listDiv = document.getElementById("toolsList");
+
+    tools.forEach(tool => {
+      const toolDiv = document.createElement("div");
+      toolDiv.className = "tool";
+
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = tool.name;
+
+      const btn = document.createElement("a");
+      if (tool.url) {
+        btn.className = "btn";
+        btn.textContent = "Download";
+        btn.href = tool.url;
+        btn.target = "_blank";
+      } else {
+        btn.className = "btn premium";
+        btn.textContent = "Premium Only";
+      }
+
+      toolDiv.appendChild(nameSpan);
+      toolDiv.appendChild(btn);
+      listDiv.appendChild(toolDiv);
+    });
+  </script>
+</body>
+</html>

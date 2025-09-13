@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ROOTX BASE - Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      color: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-box {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      width: 320px;
+    }
+    .login-box h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .login-box button {
+      width: 100%;
+      padding: 10px;
+      background: #007bff;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .login-box button:hover {
+      background: #0056b3;
+    }
+    .msg {
+      margin-top: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>ROOTX BASE LOGIN</h2>
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button onclick="login()">Login</button>
+    <div id="message" class="msg"></div>
+  </div>
+
+  <script>
+    async function login() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      const msg = document.getElementById("message");
+
+      if (!user || !pass) {
+        msg.textContent = "⚠ Please enter both fields";
+        msg.style.color = "red";
+        return;
+      }
+
+      try {
+        // JSONBin API request
+        const response = await fetch("https://api.jsonbin.io/v3/b/68beea6543b1c97be93b3527/latest", {
+          headers: {
+            "X-Master-Key": "$2a$10$O4BNOnc06HJiXrEj3a.mCegLmq0wYd3YFPtuUey2/7k7rwi7ke4nm"
+          }
+        });
+
+        const data = await response.json();
+        const users = data.record.users;
+
+        // Check credentials
+        const found = users.find(u => u.username === user && u.password === pass);
+
+        if (found) {
+          msg.textContent = "✅ Login successful! Redirecting...";
+          msg.style.color = "green";
+          setTimeout(() => {
+            window.location.href = "base.html";
+          }, 2000); // redirect after 2 sec
+        } else {
+          msg.textContent = "❌ Invalid credentials!";
+          msg.style.color = "red";
+        }
+
+      } catch (error) {
+        msg.textContent = "⚠ Error connecting to server";
+        msg.style.color = "red";
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>

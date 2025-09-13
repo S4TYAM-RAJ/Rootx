@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Safety / Report — ROOTX</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f9ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #fff;
+      border: 2px solid #007bff44;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      max-width: 500px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+    h1 { color: #0056b3; }
+    .btn {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      border: 2px solid #007bff;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+      text-decoration: none;
+    }
+    .btn.primary { background: #007bff; color: #fff; }
+    .btn:hover { transform: translateY(-2px); }
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .popup {
+      background: #fff;
+      border: 3px solid #007bff;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 400px;
+      text-align: center;
+      font-weight: bold;
+      color: #222;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>TEAM ROOTX — SAFETY</h1>
+    <p>Report This website if you think this is unsafe or dangerous false report Can lead to ten days local ban</p>
+    <a id="nextBtn" href="base.html" class="btn">NEXT</a>
+    <button id="reportBtn" class="btn primary">REPORT WEBSITE</button>
+  </div>
+
+  <div id="banOverlay" class="overlay">
+    <div class="popup">
+      You are Banned for ten  fucking days for Betrayal<br>
+      Appeal If It's an mistake <span style="color:#0056b3">anonymouswindia@gmail.com</span><br><br>
+      <button id="okBtn" class="btn primary">Oh</button>
+    </div>
+  </div>
+
+<script>
+  const BAN_KEY = "rootx_ban";
+  const TEN_DAYS = 10 * 24 * 60 * 60 * 1000;
+
+  const reportBtn = document.getElementById("reportBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const overlay = document.getElementById("banOverlay");
+  const okBtn = document.getElementById("okBtn");
+
+  function setBan() {
+    const until = Date.now() + TEN_DAYS;
+    localStorage.setItem(BAN_KEY, until);
+    showBan();
+  }
+
+  function checkBan() {
+    const until = localStorage.getItem(BAN_KEY);
+    if (until && Date.now() < until) {
+      showBan();
+    } else {
+      localStorage.removeItem(BAN_KEY);
+      hideBan();
+    }
+  }
+
+  function showBan() {
+    overlay.style.display = "flex";
+    nextBtn.setAttribute("disabled", "true");
+    nextBtn.style.pointerEvents = "none";
+    nextBtn.style.opacity = "0.5";
+  }
+
+  function hideBan() {
+    overlay.style.display = "none";
+    nextBtn.removeAttribute("disabled");
+    nextBtn.style.pointerEvents = "";
+    nextBtn.style.opacity = "";
+  }
+
+  reportBtn.addEventListener("click", setBan);
+  okBtn.addEventListener("click", () => overlay.style.display = "none");
+
+  checkBan();
+</script>
+</body>
+</html>

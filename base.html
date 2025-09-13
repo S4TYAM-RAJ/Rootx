@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ROOTX BASE</title>
+<style>
+  body { background:#fff; font-family:Arial,sans-serif; margin:0; padding:0; overflow-x:hidden; }
+  header { display:flex; align-items:center; justify-content:space-between; padding:15px 20px; background:#007BFF; color:#fff; font-size:22px; font-weight:bold; position:sticky; top:0; z-index:1001; }
+  .menu-btn { display:flex; flex-direction:column; justify-content:space-between; width:26px; height:20px; background:none; border:none; cursor:pointer; padding:0; }
+  .menu-btn span { display:block; height:3px; width:100%; background:#fff; border-radius:2px; }
+  .side-menu { height:100%; width:0; position:fixed; top:0; left:0; background:#fff; overflow-y:auto; transition:0.3s; box-shadow:2px 0 8px rgba(0,0,0,0.3); z-index:1002; }
+  .side-menu.open { width:250px; }
+  .side-menu a { display:block; padding:12px 20px; font-size:15px; color:#000; text-decoration:none; border-bottom:1px solid #eee; }
+  .side-menu a:hover { background:#007BFF; color:#fff; }
+  .section-break { border-bottom:2px solid #007BFF; margin:10px 0; }
+  .overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); opacity:0; visibility:hidden; transition:0.3s; z-index:1000; }
+  .overlay.show { opacity:1; visibility:visible; }
+  .video-box { margin:30px auto; width:90%; max-width:640px; border-radius:12px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.3); position:relative; }
+  video { width:100%; height:auto; display:block; }
+  .sound-btn { position:absolute; bottom:10px; right:10px; background:#007BFF; color:#fff; border:none; border-radius:50%; width:40px; height:40px; font-size:16px; font-weight:bold; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.3); transition:0.3s; }
+  .sound-btn:hover { background:#0056b3; }
+  .about { margin:30px auto; padding:20px; max-width:400px; border:2px solid #007BFF; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.2); text-align:left; }
+  .about h2 { margin:0 0 15px 0; font-size:20px; color:#000; text-align:center; }
+  .about p { font-size:15px; color:#333; line-height:1.5; }
+  .profile-btn { margin-top:20px; width:100%; padding:12px; background:#007BFF; color:#fff; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; transition:0.3s; }
+  .profile-btn:hover { background:#0056b3; }
+  footer { margin:40px 0; font-size:16px; font-weight:bold; color:#000; text-align:center; }
+</style>
+</head>
+<body>
+
+<div id="overlay" class="overlay" onclick="closeMenu()"></div>
+
+<header>
+  <button class="menu-btn" onclick="openMenu()">
+    <span></span><span></span><span></span>
+  </button>
+  ROOTX BASE
+</header>
+
+<div id="sideMenu" class="side-menu">
+  <a href="javascript:void(0)" onclick="closeMenu()">Close</a>
+  <a href="tools.html">Free Tools</a>
+  <a href="scripts.html">Free Script</a>
+  <a href="mods.html">Free Mods</a>
+  <a href="courses.html">Free Courses</a>
+  <a href="inventory.html">Your Inventory</a>
+  <div class="section-break"></div>
+  <a href="shop.html">Shop</a>
+  <a href="paid.html">Paid Hacking</a>
+  <div class="section-break"></div>
+  <a href="admin.html">VIP Access</a>
+  <a href="admin.html">Admin Access</a>
+  <div class="section-break"></div>
+  <a href="globalchat.html">Global Chat</a>
+  <a href="private1.html">Private Chats</a>
+  <a href="users.html">User List</a>
+  <div class="section-break"></div>
+  <a href="bug.html">Report Bug</a>
+  <a href="suggest.html">Suggest Feature</a>
+  <a href="support.html">Live Support</a>
+</div>
+
+<div class="video-box">
+  <video id="rootxVideo" autoplay muted playsinline>
+    <source src="video1.mp4" type="video/mp4">
+  </video>
+  <button class="sound-btn" onclick="toggleSound()">S</button>
+</div>
+
+<div class="about">
+  <h2>About ROOTX BASE</h2>
+  <p>
+    Welcome to ROOTX BASE. This platform provides secure access
+    and exclusive tools for verified members only.
+  </p>
+  <button class="profile-btn" onclick="window.location.href='profile.html'">Go to Profile</button>
+</div>
+
+<footer>TEAM ROOTX</footer>
+
+<script>
+const video = document.getElementById("rootxVideo");
+const videos = ["video1.mp4","video2.mp4","video3.mp4","video4.mp4","video5.mp4"];
+let index = 0;
+
+// Autoplay next video
+video.addEventListener("ended", () => {
+  index = (index + 1) % videos.length;
+  video.src = videos[index];
+  video.play();
+});
+
+// Sound toggle
+function toggleSound() {
+  video.muted = !video.muted;
+  // Change icon
+  document.querySelector(".sound-btn").textContent = video.muted ? "S" : "M";
+}
+
+// Side menu
+function openMenu() { document.getElementById("sideMenu").classList.add("open"); document.getElementById("overlay").classList.add("show"); }
+function closeMenu() { document.getElementById("sideMenu").classList.remove("open"); document.getElementById("overlay").classList.remove("show"); }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VIP Access</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: linear-gradient(135deg, #f8fbff, #e6f0ff);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: #fff;
+      border: 2px solid #0056b3;
+      border-radius: 16px;
+      padding: 35px 30px;
+      text-align: center;
+      width: 380px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    h2 {
+      color: #003d99;
+      margin-bottom: 25px;
+      font-size: 24px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1.5px solid #007bff;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 15px;
+      outline: none;
+      transition: border 0.3s;
+    }
+    input:focus {
+      border: 1.5px solid #003d99;
+    }
+    button, a {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      padding: 12px 18px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 20px;
+      box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+      transition: all 0.3s ease;
+    }
+    button:hover, a:hover {
+      background: #0056b3;
+      box-shadow: 0 6px 18px rgba(0,86,179,0.5);
+      transform: scale(1.05);
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 15px;
+      color: #000;
+      line-height: 1.5;
+    }
+    #nextBtn {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>VIP ACCESS</h2>
+    <div id="formSection">
+      <input type="text" id="username" placeholder="Set Your Local Username" maxlength="20">
+      <button onclick="setVIP()">Save & Join</button>
+    </div>
+    <div id="message"></div>
+    <a id="nextBtn" href="vip2.html">Next ➡</a>
+  </div>
+
+<script>
+function setVIP(){
+  const nameInput = document.getElementById("username").value.trim();
+  if(!nameInput){
+    alert("Please set a username.");
+    return;
+  }
+
+  // Get today's date
+  const today = new Date();
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const joinDate = today.toLocaleDateString("en-US", options);
+
+  // Save to localStorage
+  localStorage.setItem("vipUsername", nameInput);
+  localStorage.setItem("vipJoinDate", joinDate);
+
+  // Hide form and show saving message
+  document.getElementById("formSection").style.display = "none";
+  document.getElementById("message").textContent = "⚡ Saving your VIP profile...";
+
+  // Delay for 1 second then show greeting
+  setTimeout(()=>{
+    showVIP(nameInput, joinDate);
+  },1000);
+}
+
+function showVIP(username, date){
+  document.getElementById("message").innerHTML =
+    `<strong>Hello ${username},</strong><br>
+     You are now a VIP. Use your powers wisely and ethically.<br><br>
+     <em>Date of Join:</em> ${date}`;
+  document.getElementById("nextBtn").style.display = "inline-block";
+}
+
+// Auto-check if user already VIP
+window.onload = () => {
+  const savedName = localStorage.getItem("vipUsername");
+  const savedDate = localStorage.getItem("vipJoinDate");
+
+  if(savedName && savedDate){
+    // Skip asking again
+    document.getElementById("formSection").style.display = "none";
+    showVIP(savedName, savedDate);
+  }
+};
+</script>
+</body>
+</html>

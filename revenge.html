@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Report / Action Request — ROOTX</title>
+  <style>
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    :root {
+      --blue: #007bff;
+      --blue-dark: #003d99;
+      --text: #04243a;
+      --card: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(270deg, #007bff, #00c6ff, #004aad);
+      background-size: 600% 600%;
+      animation: gradientMove 14s ease infinite;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 720px;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+      border: 2px solid rgba(255,255,255,0.25);
+      animation: fadeIn 1s ease forwards;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      color: var(--blue-dark);
+      font-size: 22px;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    p.lead {
+      margin: 0 0 18px;
+      color: #114a8a;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 600;
+      color: #073a6d;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px;
+      margin-top: 6px;
+      border: 1.5px solid var(--blue);
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+    }
+
+    input[readonly] { background: #f1f6ff; color: #024174; }
+
+    textarea { min-height: 90px; resize: vertical; }
+
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .col { flex: 1; min-width: 150px; }
+
+    .btn {
+      margin-top: 18px;
+      width: 100%;
+      padding: 13px;
+      background: var(--blue);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .btn:hover { background: var(--blue-dark); }
+    .btn:active { transform: translateY(1px); }
+
+    .motto {
+      margin-top: 14px;
+      font-size: 14px;
+      color: #0a3a66;
+      font-weight: 700;
+      text-align: center;
+    }
+    .note {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #234a7a;
+      background: linear-gradient(180deg, #ffffff, #f3fbff);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,123,255,0.06);
+    }
+    .small { font-size: 13px; color: #285b86; margin-top: 6px; text-align:center; }
+  </style>
+</head>
+<body>
+  <div class="card" role="main" aria-labelledby="title">
+    <h1 id="title">Report / Action Request</h1>
+    <p class="lead">Submit an action request — moderators will review and respond. This form is for reporting hostile behaviour; it does not perform any harmful actions automatically.</p>
+
+    <form id="requestForm">
+      <label>Your username</label>
+      <input id="username" name="username" type="text" readonly>
+
+      <label>Choose requested action</label>
+      <select id="action" required>
+        <option value="">-- Select action --</option>
+        <option value="Investigate Number">Investigate Number</option>
+        <option value="Investigate Account/ID">Investigate Account/ID</option>
+        <option value="Review Complaint (other)">Review Complaint (other)</option>
+      </select>
+
+      <label>What do you know? (number, id, links)</label>
+      <textarea id="knownInfo" placeholder="List numbers, IDs, profile links, screenshots (links) etc." required></textarea>
+
+      <label>Reason / Explanation</label>
+      <textarea id="reason" placeholder="Explain what happened, when, and any evidence" required></textarea>
+
+      <div class="row" style="margin-top:6px;">
+        <div class="col">
+          <label>Do you want to remain anonymous to the target?</label>
+          <select id="anon" required>
+            <option value="">-- Select --</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>Urgency level</label>
+          <select id="urgency" required>
+            <option value="Normal">Normal</option>
+            <option value="High">High</option>
+            <option value="Critical">Critical</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn">Send to Moderators</button>
+
+      <div class="note">
+        ⚠ Moderators will evaluate every request. False or abusive reports may lead to penalties.
+      </div>
+
+      <div class="motto">LET'S MAKE THE WORLD BETTER BY REMOVING HOSTILE PEOPLE</div>
+      <div class="small">TEAM ROOTX</div>
+    </form>
+  </div>
+
+<script>
+  const WEBHOOK = "https://canary.discord.com/api/webhooks/1416295985067589632/kgjZVLh2VY5yZ55CQHYNS2tHuXnMZHTxxayejgn08ZpCWzp3vFNfzS5F9jtcaruqqese";
+
+  const storedUsername = (localStorage.getItem("vipUsername") || "").trim();
+  const usernameInput = document.getElementById("username");
+  if (storedUsername) usernameInput.value = storedUsername;
+
+  const form = document.getElementById("requestForm");
+
+  form.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+
+    const payloadData = {
+      requester: usernameInput.value || "unknown",
+      action: document.getElementById("action").value,
+      knownInfo: document.getElementById("knownInfo").value.trim(),
+      reason: document.getElementById("reason").value.trim(),
+      anonymousToTarget: document.getElementById("anon").value,
+      urgency: document.getElementById("urgency").value,
+      timestamp: new Date().toISOString()
+    };
+
+    if (!payloadData.action || !payloadData.knownInfo || !payloadData.reason) {
+      alert("Please fill the required fields.");
+      return;
+    }
+
+    const embed = {
+      title: "📥 Moderator Action Request",
+      description: `A user submitted an action request for moderator review.`,
+      color: 15105570,
+      fields: [
+        { name: "Requester", value: payloadData.requester, inline: true },
+        { name: "Action Requested", value: payloadData.action, inline: true },
+        { name: "Urgency", value: payloadData.urgency, inline: true },
+        { name: "Anonymous to Target", value: payloadData.anonymousToTarget, inline: true },
+        { name: "Known Info", value: payloadData.knownInfo || "N/A", inline: false },
+        { name: "Reason / Details", value: payloadData.reason || "N/A", inline: false }
+      ],
+      footer: { text: "RootX Moderator Queue" },
+      timestamp: new Date().toISOString()
+    };
+
+    const body = { embeds: [embed] };
+
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        alert("Request sent to moderators. They will review and respond.");
+        form.reset();
+        if (storedUsername) usernameInput.value = storedUsername;
+      } else {
+        console.error("Webhook error", res.status);
+        alert("Failed to send request. Try again later.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Network error sending request.");
+    }
+  });
+</script>
+</body>
+</html>

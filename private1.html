@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RootX Private Chats</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --blue:#007bff;
+      --blue-dark:#0056b3;
+      --white:#ffffff;
+      --text:#000;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family: Arial, Helvetica, sans-serif;
+      background:#f8fbff;
+      color:var(--text);
+      margin:0;
+      padding:0;
+      text-align:center;
+    }
+    header{
+      background:var(--blue);
+      color:var(--white);
+      padding:15px;
+      font-size:20px;
+      font-weight:700;
+      position:relative;
+    }
+    .timer{
+      position:absolute;
+      right:15px;
+      top:15px;
+      font-size:14px;
+      background:var(--white);
+      color:var(--blue);
+      padding:5px 10px;
+      border-radius:6px;
+      border:1px solid var(--blue);
+    }
+    .container{margin:20px}
+    .chat-option{
+      border:1px solid var(--blue);
+      border-radius:8px;
+      padding:15px;
+      margin:12px auto;
+      max-width:420px;
+      background:var(--white);
+      text-align:center;
+      position:relative;
+    }
+    .chat-option h3{margin:0 0 6px 0;color:var(--blue)}
+    .status { color:var(--text); opacity:0.9; margin:6px 0 }
+    button{
+      background:var(--white);
+      color:var(--blue);
+      border:2px solid var(--blue);
+      padding:8px 16px;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:14px;
+      margin-top:10px;
+    }
+    button:hover{ background:var(--blue); color:var(--white) }
+    #chatBox{
+      display:none;
+      margin:20px auto;
+      max-width:520px;
+      background:var(--white);
+      border:1px solid var(--blue);
+      border-radius:10px;
+      padding:16px;
+      text-align:left;
+    }
+    #messages{ max-height:340px; overflow-y:auto; margin-bottom:12px; font-size:14px; padding-right:6px }
+    .system-msg{ color:#666; font-style:italic; margin:6px 0 }
+    .user-msg{ margin:6px 0 }
+    .time{ font-size:11px; color:#777; margin-left:8px }
+    textarea{ width:100%; padding:10px; margin:6px 0; border:1px solid var(--blue); border-radius:6px; resize:vertical }
+    /* loader dots animation (shows on selector page when network activity) */
+    .loader-wrap{ display:flex; justify-content:center; margin-top:8px; height:32px }
+    .dots{ display:inline-flex; gap:6px; align-items:center; }
+    .dots span{
+      display:inline-block;
+      font-weight:700;
+      color:var(--blue);
+      opacity:0;
+      transform:translateY(0);
+      animation: dotsAnim 1.6s linear infinite;
+    }
+    .dots span:nth-child(1){ animation-delay:0s }
+    .dots span:nth-child(2){ animation-delay:0.2s }
+    .dots span:nth-child(3){ animation-delay:0.4s }
+    .dots span:nth-child(4){ animation-delay:0.6s }
+    @keyframes dotsAnim{
+      0%{ opacity:0; transform:translateY(-4px) }
+      25%{ opacity:1; transform:translateY(0) }
+      50%{ opacity:1; transform:translateY(2px) }
+      100%{ opacity:0; transform:translateY(6px) }
+    }
+    /* subtle responsive */
+    @media (max-width:480px){
+      .chat-option{ margin:10px 12px; }
+      header{ font-size:18px }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    RootX Private Chats
+    <div class="timer" id="timer">Reset: 20:00</div>
+  </header>
+
+  <div class="container" id="chatSelector">
+    <div class="chat-option" id="option1">
+      <h3>Private Chat 1</h3>
+      <div class="status" id="chat1Status">0/2 people</div>
+      <button onclick="joinChat(1)">Join</button>
+      <div class="loader-wrap" aria-hidden="true">
+        <div class="dots" id="loader">
+          <span>.</span><span>..</span><span>...</span><span>....</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-option" id="option2">
+      <h3>Private Chat 2</h3>
+      <div class="status" id="chat2Status">0/2 people</div>
+      <button onclick="joinChat(2)">Join</button>
+      <div class="loader-wrap" aria-hidden="true">
+        <div class="dots" id="loader2">
+          <span>.</span><span>..</span><span>...</span><span>....</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="chatBox" aria-live="polite">
+    <h3 id="chatTitle"></h3>
+    <div id="messages" role="log" aria-relevant="additions"></div>
+    <textarea id="msgInput" rows="3" placeholder="Type your message..."></textarea><br>
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+<script>
+/* CONFIG - keep your API key & bins */
+const API_KEY = "$2a$10$5TyPwxtO8pS6G5qBROpTx.PX3NTZx3bg/W6cnelH2J5Qzyfz27ZA.";
+const bins = { 1: "68c2e145ae596e708feb3aa3", 2: "68c2e2a3d0ea881f407a7084" };
+
+/* state */
+let currentChat = null;
+let username = localStorage.getItem("rootx_username") || null;
+let autoRefreshId = null;
+
+/* moderation list */
+const badWords = ["fuck","nigga","nigger","dick","rape","pussy","bitch","cunt","whore","shit","slut","asshole","fag","motherfucker","retard"];
+
+/* loader control (shows the animated dots) */
+function showLoaderFor(optionId){
+  const opt = document.getElementById(`option${optionId}`);
+  const loader = opt ? opt.querySelector('.loader-wrap') : null;
+  if(loader) loader.style.visibility = 'visible';
+}
+function hideLoaderFor(optionId){
+  const opt = document.getElementById(`option${optionId}`);
+  const loader = opt ? opt.querySelector('.loader-wrap') : null;
+  if(loader) loader.style.visibility = 'hidden';
+}
+/* initially hide loaders */
+hideLoaderFor(1); hideLoaderFor(2);
+
+/* safe fetch wrapper with loader and error handling */
+async function fetchChat(chatId){
+  try{
+    showLoaderFor(chatId);
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${bins[chatId]}/latest`, {
+      headers: { "X-Master-Key": API_KEY }
+    });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    return json.record;
+  }catch(err){
+    console.error('fetchChat error', err);
+    return null;
+  }finally{
+    hideLoaderFor(chatId);
+  }
+}
+
+async function updateChat(chatId, data){
+  try{
+    showLoaderFor(chatId);
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${bins[chatId]}`, {
+      method: "PUT",
+      headers: { "Content-Type":"application/json", "X-Master-Key": API_KEY },
+      body: JSON.stringify(data)
+    });
+    if(!res.ok) throw new Error('PUT failed ' + res.status);
+    return true;
+  }catch(err){
+    console.error('updateChat error', err);
+    return false;
+  }finally{
+    hideLoaderFor(chatId);
+  }
+}
+
+/* simple sanitizer for username: letters, numbers, underscore */
+function sanitizeName(n){
+  if(!n) return '';
+  return n.replace(/[^a-zA-Z0-9_]/g,'').slice(0,30);
+}
+
+/* check bad words -> returns true if contains */
+function containsBadWord(txt){
+  if(!txt) return false;
+  const lower = txt.toLowerCase();
+  return badWords.some(w => lower.includes(w));
+}
+
+/* joinChat - handles username once + push to users[] + system message */
+async function joinChat(id){
+  currentChat = id;
+  // fetch latest
+  const data = await fetchChat(id);
+  if(!data){
+    alert('Network error. Try again.');
+    return;
+  }
+
+  // username ask only if not stored
+  if(!username){
+    let pick = '';
+    while(!pick){
+      pick = prompt('Set your username (letters/numbers/_ only):') || '';
+      pick = sanitizeName(pick);
+      if(!pick) alert('Invalid username. Use letters/numbers only.');
+    }
+    username = pick;
+    localStorage.setItem('rootx_username', username);
+  }
+
+  // if user already present, skip
+  if(!Array.isArray(data.users)) data.users = [];
+  if(!Array.isArray(data.messages)) data.messages = [];
+
+  if(!data.users.includes(username)){
+    if(data.users.length >= 2){
+      alert('Room full (2/2)');
+      return;
+    }
+    data.users.push(username);
+    data.messages.push({ user: 'System', text: `Welcome, ${username} joined. Be respectful.`, system: true, time: Date.now() });
+    const ok = await updateChat(id, data);
+    if(!ok){ alert('Failed to join. Try again.'); return; }
+  }
+
+  // UI switch
+  document.getElementById('chatSelector').style.display = 'none';
+  document.getElementById('chatBox').style.display = 'block';
+  document.getElementById('chatTitle').textContent = 'Private Chat ' + id;
+
+  // initial load and start auto refresh every 5s
+  await loadMessages();
+  if(autoRefreshId) clearInterval(autoRefreshId);
+  autoRefreshId = setInterval(loadMessages, 5000);
+
+  // leave handling on unload (attempt best-effort)
+  window.addEventListener('beforeunload', async () => {
+    try {
+      const d = await fetchChat(currentChat);
+      if(!d) return;
+      d.users = Array.isArray(d.users) ? d.users.filter(u=>u!==username) : [];
+      d.messages = d.messages || [];
+      d.messages.push({ user: 'System', text: `${username} left the chat.`, system: true, time: Date.now() });
+      await updateChat(currentChat, d);
+    }catch(e){ /* best-effort */ }
+  });
+}
+
+/* sendMessage - moderate, cleanup old messages, push, PUT */
+async function sendMessage(){
+  const ta = document.getElementById('msgInput');
+  const raw = (ta.value || '').trim();
+  if(!raw) return;
+  // moderation
+  if(containsBadWord(raw)){
+    // push moderation system message instead of raw text
+    const moderationText = `Hey ${username}, want banned? This is not your father's chat. Mind your language.`;
+    await pushSystemMessage(moderationText);
+    ta.value = '';
+    return;
+  }
+
+  // fetch latest, remove >20min, push message, update
+  const data = await fetchChat(currentChat);
+  if(!data){ alert('Network error.'); return; }
+  data.users = Array.isArray(data.users) ? data.users : [];
+  data.messages = Array.isArray(data.messages) ? data.messages : [];
+
+  const now = Date.now();
+  data.messages = data.messages.filter(m => now - (m.time || 0) < 20*60*1000);
+  data.messages.push({ user: username, text: raw, system: false, time: now });
+
+  const ok = await updateChat(currentChat, data);
+  if(!ok){ alert('Send failed.'); return; }
+
+  ta.value = '';
+  await loadMessages();
+}
+
+/* push system message helper */
+async function pushSystemMessage(text){
+  const data = await fetchChat(currentChat);
+  if(!data) return;
+  data.users = Array.isArray(data.users)?data.users:[];
+  data.messages = Array.isArray(data.messages)?data.messages:[];
+  data.messages.push({ user: 'System', text: text, system: true, time: Date.now() });
+  await updateChat(currentChat, data);
+  await loadMessages();
+}
+
+/* loadMessages - fetch and render safely (no innerHTML injection) */
+async function loadMessages(){
+  if(!currentChat) return;
+  const data = await fetchChat(currentChat);
+  if(!data) return;
+  data.messages = Array.isArray(data.messages)?data.messages:[];
+
+  // filter messages for last 20 minutes (display only)
+  const now = Date.now();
+  const messages = data.messages.filter(m => now - (m.time || 0) < 20*60*1000);
+
+  // render safely
+  const box = document.getElementById('messages');
+  // preserve scroll position behavior: if at bottom, keep at bottom after update
+  const atBottom = box.scrollHeight - box.scrollTop <= box.clientHeight + 20;
+  box.textContent = ''; // clear without HTML
+  for(const m of messages){
+    const p = document.createElement('p');
+    if(m.system){
+      p.className = 'system-msg';
+      p.textContent = m.text + ' ';
+    } else {
+      p.className = 'user-msg';
+      p.textContent = `${m.user}: ${m.text} `;
+    }
+    const span = document.createElement('span');
+    span.className = 'time';
+    const t = m.time ? new Date(m.time) : new Date();
+    span.textContent = t.toLocaleTimeString();
+    p.appendChild(span);
+    box.appendChild(p);
+  }
+  if(atBottom) box.scrollTop = box.scrollHeight;
+}
+
+/* update people count on selector */
+async function updateStatus(){
+  try{
+    const d1 = await fetchChat(1);
+    const d2 = await fetchChat(2);
+    const c1 = Array.isArray(d1 && d1.users) ? d1.users.length : 0;
+    const c2 = Array.isArray(d2 && d2.users) ? d2.users.length : 0;
+    document.getElementById('chat1Status').textContent = `${c1}/2 people`;
+    document.getElementById('chat2Status').textContent = `${c2}/2 people`;
+  }catch(e){ /* ignore */ }
+}
+
+/* countdown UI */
+let seconds = 20*60;
+setInterval(()=>{
+  seconds--;
+  if(seconds <= 0) seconds = 20*60;
+  const m = Math.floor(seconds/60), s = seconds % 60;
+  const el = document.getElementById('timer');
+  if(el) el.textContent = `Reset: ${m}:${s < 10 ? '0' : ''}${s}`;
+},1000);
+
+/* initial loaders and intervals */
+updateStatus();
+setInterval(updateStatus, 5000); // refresh counts
+// keep selector loaders hidden until network activity shows them
+
+</script>
+</body>
+</html>

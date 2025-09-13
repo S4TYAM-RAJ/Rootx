@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ROOTX COURSES</title>
+  <style>
+    body {
+      background: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 10px;
+      text-align: center;
+      color: #000;
+    }
+
+    p.intro {
+      text-align: center;
+      color: #444;
+      margin-bottom: 20px;
+    }
+
+    .course {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .course span {
+      font-size: 14px;
+      font-weight: bold;
+      color: #000;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn {
+      padding: 6px 12px;
+      background: #007BFF;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      border: none;
+      transition: 0.3s;
+    }
+
+    .btn:hover { background: #0056b3; }
+
+    footer {
+      margin: 30px 0;
+      font-size: 16px;
+      font-weight: bold;
+      color: #000;
+      text-align: center;
+    }
+
+    /* Ad popup */
+    #adPopup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #100;
+      color: #ggf;
+      width: 280px;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      display: none;
+      z-index: 1000;
+    }
+
+    #adPopup img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    #adPopup h3 {
+      margin: 10px 0;
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .ad-btn {
+      display: inline-block;
+      margin: 5px;
+      padding: 8px 14px;
+      background: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .ad-btn:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h1>ROOTX COURSES</h1>
+  <p class="intro">Made by thousands, provided by Rootx</p>
+
+  <div id="coursesList"></div>
+
+  <footer>TEAM ROOTX</footer>
+
+  <!-- Ad popup -->
+  <div id="adPopup">
+    <img src="whatsapp3.png" alt="Ad">
+    <h3>Join our WhatsApp channel for latest updates</h3>
+    <a href="https://whatsapp.com/channel/0029VbB1gWpK5cD7vD1WuF1b" target="_blank">
+      <button class="ad-btn">Visit</button>
+    </a>
+    <button id="skipBtn" class="ad-btn" disabled>Skip (5s)</button>
+  </div>
+
+  <script>
+    const link = "https://t.me/+xi-ikZNakTkyZTk1";
+    const courses = [
+      "Carding Course",
+      "Ethical Hacker Course",
+      "Brute Force Course",
+      "Gmail Brute Force Course",
+      "Insta Ban Course",
+      "WiFi Hack Course",
+      "Termux Basic Course",
+      "Pentesting Masterclass",
+      "OSINT Basics",
+      "Cybersecurity Advanced"
+    ];
+
+    const listDiv = document.getElementById("coursesList");
+
+    courses.forEach(course => {
+      const div = document.createElement("div");
+      div.className = "course";
+
+      const name = document.createElement("span");
+      name.textContent = course;
+
+      const btn = document.createElement("a");
+      btn.className = "btn";
+      btn.textContent = "Join";
+      btn.href = link;
+      btn.target = "_blank";
+
+      div.appendChild(name);
+      div.appendChild(btn);
+      listDiv.appendChild(div);
+    });
+
+    // Ad logic
+    const adPopup = document.getElementById("adPopup");
+    const skipBtn = document.getElementById("skipBtn");
+
+    function showAd() {
+      adPopup.style.display = "block";
+      let countdown = 5;
+      skipBtn.textContent = `Skip (${countdown}s)`;
+      skipBtn.disabled = true;
+
+      const timer = setInterval(() => {
+        countdown--;
+        skipBtn.textContent = countdown > 0 ? `Skip (${countdown}s)` : "Skip";
+        if (countdown <= 0) {
+          skipBtn.disabled = false;
+          clearInterval(timer);
+        }
+      }, 1000);
+    }
+
+    skipBtn.addEventListener("click", () => {
+      adPopup.style.display = "none";
+    });
+
+    // First ad after 10 seconds
+    setTimeout(showAd, 1000);
+
+    // Then every 2 minutes
+    setInterval(showAd, 120000);
+  </script>
+</body>
+</html>

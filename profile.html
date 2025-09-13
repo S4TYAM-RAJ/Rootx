@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Set Username</title>
+  <style>
+    body {
+      background: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 20px;
+      color: #000;
+    }
+
+    .box {
+      margin: 40px auto;
+      max-width: 300px;
+      padding: 20px;
+      border: 2px solid #007BFF;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 12px 0;
+      border: 1px solid #007BFF;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    button:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-weight: bold;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Set Your Username</h1>
+
+  <div class="box">
+    <input type="text" id="username" placeholder="Enter username (A–Z only)">
+    <button id="confirmBtn">Confirm</button>
+  </div>
+
+  <footer>TEAM ROOTX</footer>
+
+  <script>
+    const binId = "68c0db7843b1c97be93d3001";
+    const apiKey = "$2a$10$5TyPwxtO8pS6G5qBROpTx.PX3NTZx3bg/W6cnelH2J5Qzyfz27ZA.";
+    const inputEl = document.getElementById("username");
+    const btnEl = document.getElementById("confirmBtn");
+
+    // Check if username already exists in localStorage
+    const savedName = localStorage.getItem("username");
+    if (savedName) {
+      inputEl.value = savedName;
+      inputEl.disabled = true;
+      btnEl.disabled = true;
+      alert(`Your username is already set as "${savedName}". It cannot be changed.`);
+    }
+
+    // Allow only alphabets
+    inputEl.addEventListener("input", function() {
+      this.value = this.value.replace(/[^A-Za-z]/g, "");
+    });
+
+    btnEl.addEventListener("click", setUsername);
+
+    async function setUsername() {
+      // Prevent multiple usernames
+      if (localStorage.getItem("username")) return;
+
+      const username = inputEl.value.trim();
+      if (!username) {
+        alert("Username cannot be empty!");
+        return;
+      }
+
+      // Save locally to prevent more entries
+      localStorage.setItem("username", username);
+
+      // Auto date format
+      const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+      const joinedDate = new Date().toLocaleDateString("en-US", options);
+
+      try {
+        // Get user country by IP
+        const geoRes = await fetch("https://ipapi.co/json/");
+        const geoData = await geoRes.json();
+        const country = geoData.country_name || "Unknown";
+
+        // Fetch existing users
+        let res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+          headers: { "X-Master-Key": apiKey }
+        });
+        let data = await res.json();
+        let users = data.record.users || [];
+
+        // Add new user
+        let nextId = "user" + (users.length + 1);
+        users.push({
+          id: nextId,
+          username: username,
+          joined: joinedDate,
+          country: country
+        });
+
+        // Update JSON Bin
+        let updateRes = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Master-Key": apiKey
+          },
+          body: JSON.stringify({ users })
+        });
+
+        if (updateRes.ok) {
+          alert("✅ Username saved successfully!");
+          inputEl.disabled = true;
+          btnEl.disabled = true;
+        } else {
+          alert("❌ Failed to save.");
+        }
+      } catch (e) {
+        alert("⚠ Error connecting to server.");
+      }
+    }
+  </script>
+
+</body>
+</html>

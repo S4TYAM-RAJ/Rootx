@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Others</title>
+  <style>
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #fff;
+      background: linear-gradient(-45deg, #4a90e2, #9013fe, #ff6f61, #50e3c2);
+      background-size: 400% 400%;
+      animation: gradientMove 12s ease infinite;
+    }
+    .wrapper {
+      max-width: 650px;
+      width: 100%;
+      padding: 30px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      animation: fadeUp 1.2s ease forwards;
+      text-align: left;
+    }
+    h1 {
+      font-size: 30px;
+      margin: 0 0 15px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-size: 15px;
+      color: #fff;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+      margin-bottom: 12px;
+      outline: none;
+      resize: none;
+    }
+    textarea {
+      min-height: 120px;
+      max-height: 250px;
+      max-length: 300;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #007bff;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h1>Others</h1>
+    <form id="othersForm">
+      <label>Your Username</label>
+      <input type="text" id="username" readonly>
+
+      <label>Write what you want or what happened (max 300 words)</label>
+      <textarea id="message" maxlength="1800" placeholder="Type your message here..."></textarea>
+
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <script>
+    // Autofill username from localStorage
+    const usernameField = document.getElementById("username");
+    const storedName = localStorage.getItem("vipUsername") || "Guest";
+    usernameField.value = storedName;
+
+    // Submit handler (example with webhook)
+    document.getElementById("othersForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      const message = document.getElementById("message").value.trim();
+      if(!message){
+        alert("Please enter your message.");
+        return;
+      }
+      const payload = {
+        content: `📌 Others Request\n👤 Username: ${storedName}\n📝 Message: ${message}`
+      };
+      fetch("https://canary.discord.com/api/webhooks/1416295985067589632/kgjZVLh2VY5yZ55CQHYNS2tHuXnMZHTxxayejgn08ZpCWzp3vFNfzS5F9jtcaruqqese", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).then(()=>{
+        alert("Submitted successfully ✅");
+        document.getElementById("othersForm").reset();
+        usernameField.value = storedName;
+      }).catch(()=>{
+        alert("Error submitting request.");
+      });
+    });
+  </script>
+</body>
+</html>

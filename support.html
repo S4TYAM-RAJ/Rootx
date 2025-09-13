@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RootX AI Assistant</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8fbff;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #007bff;
+      color: #fff;
+      text-align: center;
+      padding: 15px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    #chatBox {
+      max-width: 500px;
+      margin: 20px auto;
+      background: #fff;
+      border: 2px solid #007bff;
+      border-radius: 10px;
+      padding: 15px;
+      min-height: 400px;
+      overflow-y: auto;
+    }
+    .msg {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      max-width: 80%;
+      font-size: 14px;
+    }
+    .user {
+      background: #007bff;
+      color: #fff;
+      margin-left: auto;
+      text-align: right;
+    }
+    .bot {
+      background: #eaf3ff;
+      color: #000;
+      margin-right: auto;
+      text-align: left;
+      border: 1px solid #007bff;
+    }
+    #typing {
+      font-style: italic;
+      color: gray;
+      font-size: 13px;
+      display: none;
+    }
+    #inputArea {
+      display: flex;
+      max-width: 500px;
+      margin: 10px auto;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #007bff;
+      border-radius: 6px;
+    }
+    button {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      margin-left: 5px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .menu {
+      margin-top: 15px;
+      border-top: 1px solid #007bff;
+      padding-top: 10px;
+    }
+    .redirect-btn {
+      margin-top: 10px;
+      display: inline-block;
+      background: #007bff;
+      color: #fff;
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <header>RootX AI Assistant</header>
+
+  <div id="chatBox">
+    <div class="msg bot">👋 Hi! I'm RootX Assistant. Type something to begin.</div>
+  </div>
+
+  <div id="typing">Agent is typing...</div>
+
+  <div id="inputArea">
+    <input type="text" id="userInput" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+<script>
+const chatBox = document.getElementById("chatBox");
+const typing = document.getElementById("typing");
+let menuShown = false;
+
+// Append message
+function addMessage(text, sender){
+  const div = document.createElement("div");
+  div.className = "msg " + sender;
+  div.textContent = text;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// Show typing simulation
+function showTyping(callback){
+  typing.style.display = "block";
+  setTimeout(()=>{
+    typing.style.display = "none";
+    callback();
+  },2000); // 2 seconds typing delay
+}
+
+// Handle user input
+function sendMessage(){
+  const input = document.getElementById("userInput");
+  let text = input.value.trim();
+  if(!text) return;
+  addMessage(text,"user");
+  input.value = "";
+
+  processMessage(text.toLowerCase());
+}
+
+// Process bot responses (using "contains")
+function processMessage(msg){
+  if(msg.includes("hi") || msg.includes("hello")){
+    showTyping(()=>{
+      addMessage("Hi, how are you? How can I help you?","bot");
+      triggerMenu();
+    });
+  }
+  else if(msg.includes("who are u")){
+    showTyping(()=>{
+      addMessage("I'm an AI trained to answer your questions by RootX.","bot");
+      triggerMenu();
+    });
+  }
+  else if(msg.includes("what")){
+    showTyping(()=>{
+      addMessage("Uhmm what???","bot");
+    });
+  }
+  else if(msg.includes(".")){
+    showTyping(()=>{
+      addMessage(":)","bot");
+    });
+  }
+  else if(msg.includes("bruh")){
+    showTyping(()=>{
+      addMessage("What the fuck happend","bot");
+    });
+  }
+  else if(msg.includes("bye")){
+    showTyping(()=>{
+      addMessage("Bye, don't come back 👋","bot");
+    });
+  }
+  else if(msg.includes("good morning")){
+    showTyping(()=>{
+      addMessage("Good morning ☀️ Have a great day!","bot");
+    });
+  }
+  else if(msg.includes("night")){
+    showTyping(()=>{
+      addMessage("Good night 🌙 sweet dreams...","bot");
+    });
+  }
+  else if(msg.includes("manu") || msg.includes("menu")){
+    showTyping(()=>{
+      triggerMenu(true);
+    });
+  }
+  else if(msg.includes("ok") || msg.includes("okay")){
+    showTyping(()=>{
+      addMessage("I can't reply to this. Type 'Menu' for more or contact 📧 anonymouswindia@gmail.com","bot");
+    });
+  }
+  else if(msg.includes("email")){
+    showTyping(()=>{
+      addMessage("📧 anonymouswindia@gmail.com","bot");
+    });
+  }
+  else {
+    showTyping(()=>{
+      addMessage("I can't reply to this. Type 'Menu' for more or contact 📧 anonymouswindia@gmail.com","bot");
+    });
+  }
+}
+
+// Show help menu
+function triggerMenu(force=false){
+  if(menuShown && !force) return;
+  menuShown = true;
+  setTimeout(()=>{
+    let menuText = "📌 Help Menu\nReply with number to select:\n";
+    menuText += "1. Found a bug\n";
+    menuText += "2. Got an idea\n";
+    menuText += "3. Found a dangerous app in inventory\n";
+    menuText += "4. Suggestion\n";
+    menuText += "5. Report user\n";
+    menuText += "6. Contact support\n";
+    menuText += "7. Request new feature\n";
+    menuText += "8. Security issue\n";
+    menuText += "9. Feedback\n";
+    menuText += "10. Other issue";
+    addMessage(menuText,"bot");
+
+    // Add redirect button
+    const btn = document.createElement("a");
+    btn.href = "bugandsugges.html";
+    btn.textContent = "➡ Go to Bug & Suggestion Page";
+    btn.className = "redirect-btn";
+
+    const menuDiv = document.createElement("div");
+    menuDiv.className = "menu";
+    menuDiv.appendChild(btn);
+
+    chatBox.appendChild(menuDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  },5000);
+}
+</script>
+</body>
+</html>

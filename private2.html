@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RootX Private Chats</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8fbff;
+      color: #000;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background: #007bff;
+      color: #fff;
+      padding: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      position: relative;
+    }
+    .timer {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      font-size: 14px;
+      background: #fff;
+      color: #007bff;
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid #007bff;
+    }
+    .container {
+      margin: 20px;
+    }
+    .chat-option {
+      border: 1px solid #007bff;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px auto;
+      max-width: 400px;
+      background: #fff;
+    }
+    button {
+      background: #fff;
+      color: #007bff;
+      border: 2px solid #007bff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #007bff;
+      color: #fff;
+    }
+    #chatBox {
+      display: none;
+      margin: 20px auto;
+      max-width: 500px;
+      background: #fff;
+      border: 1px solid #007bff;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: left;
+    }
+    #messages {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    input, textarea {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #007bff;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    RootX Private Chats
+    <div class="timer" id="timer">Reset: 20:00</div>
+  </header>
+
+  <div class="container" id="chatSelector">
+    <div class="chat-option">
+      <h3>Private Chat 1</h3>
+      <p id="chat1Status">0/2 people</p>
+      <button onclick="joinChat(1)">Join</button>
+    </div>
+    <div class="chat-option">
+      <h3>Private Chat 2</h3>
+      <p id="chat2Status">0/2 people</p>
+      <button onclick="joinChat(2)">Join</button>
+    </div>
+  </div>
+
+  <div id="chatBox">
+    <h3 id="chatTitle"></h3>
+    <div id="messages"></div>
+    <textarea id="msgInput" placeholder="Type your message..."></textarea><br>
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+<script>
+const API_KEY = "$2a$10$5TyPwxtO8pS6G5qBROpTx.PX3NTZx3bg/W6cnelH2J5Qzyfz27ZA.";
+const bins = {
+  1: "68c2e145ae596e708feb3aa3",
+  2: "68c2e2a3d0ea881f407a7084"
+};
+let currentChat = null;
+let username = null;
+let intervalId;
+
+// bad word filter
+const badWords = ["fuck","nigga","nigger","dick","rape","pussy","bitch","cunt","whore","shit"];
+function cleanText(txt){
+  let lowered = txt.toLowerCase();
+  for (let w of badWords){
+    if (lowered.includes(w)) return "[CENSORED]";
+  }
+  return txt;
+}
+
+// fetch users/messages
+async function fetchChat(chatId){
+  const res = await fetch(`https://api.jsonbin.io/v3/b/${bins[chatId]}/latest`, {
+    headers: { "X-Master-Key": API_KEY }
+  });
+  return (await res.json()).record;
+}
+
+// update bin
+async function updateChat(chatId,data){
+  await fetch(`https://api.jsonbin.io/v3/b/${bins[chatId]}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type":"application/json",
+      "X-Master-Key": API_KEY
+    },
+    body: JSON.stringify(data)
+  });
+}
+
+// join chat
+async function joinChat(id){
+  currentChat = id;
+  let data = await fetchChat(id);
+  if (!username){
+    username = prompt("Enter your username (only text, no emojis):").replace(/[^a-zA-Z0-9_]/g,"");
+  }
+  if (!data.users.includes(username)){
+    if (data.users.length >= 2){
+      alert("Room full (2/2)");
+      return;
+    }
+    data.users.push(username);
+    await updateChat(id,data);
+  }
+  document.getElementById("chatSelector").style.display="none";
+  document.getElementById("chatBox").style.display="block";
+  document.getElementById("chatTitle").innerText="Private Chat "+id;
+  loadMessages();
+  intervalId = setInterval(loadMessages,3000);
+}
+
+// send message
+async function sendMessage(){
+  const input = document.getElementById("msgInput");
+  let text = cleanText(input.value.trim());
+  if (!text) return;
+  let data = await fetchChat(currentChat);
+  data.messages.push({user: username,text: text,system:false,time: Date.now()});
+  await updateChat(currentChat,data);
+  input.value="";
+  loadMessages();
+}
+
+// load & cleanup messages
+async function loadMessages(){
+  let data = await fetchChat(currentChat);
+  let now = Date.now();
+  data.messages = data.messages.filter(m => now - m.time < 20*60*1000); // 20 min
+  await updateChat(currentChat,data);
+  let msgBox=document.getElementById("messages");
+  msgBox.innerHTML="";
+  data.messages.forEach(m=>{
+    msgBox.innerHTML+=`<p><b>${m.user}:</b> ${m.text}</p>`;
+  });
+}
+
+// countdown timer
+let seconds = 20*60;
+setInterval(()=>{
+  seconds--;
+  if (seconds<=0) seconds=20*60;
+  let m=Math.floor(seconds/60),s=seconds%60;
+  document.getElementById("timer").innerText=`Reset: ${m}:${s<10?"0":""}${s}`;
+},1000);
+
+// show people count
+async function updateStatus(){
+  let data1=await fetchChat(1);
+  document.getElementById("chat1Status").innerText=`${data1.users.length}/2 people`;
+  let data2=await fetchChat(2);
+  document.getElementById("chat2Status").innerText=`${data2.users.length}/2 people`;
+}
+setInterval(updateStatus,5000);
+updateStatus();
+</script>
+</body>
+</html>

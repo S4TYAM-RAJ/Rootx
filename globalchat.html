@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Global Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff;
+      color: #000;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    #chatBox {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      border: 1px solid #007BFF;
+      border-radius: 8px;
+      padding: 10px;
+      height: 400px;
+      overflow-y: auto;
+      background: #f9f9f9;
+    }
+    .message {
+      margin: 6px 0;
+      padding: 6px;
+      border-radius: 6px;
+    }
+    .user {
+      background: #e0f0ff;
+    }
+    .system {
+      background: #fff3cd;
+      color: #856404;
+      font-weight: bold;
+    }
+    #msgInput {
+      width: 80%;
+      padding: 8px;
+      margin-top: 10px;
+    }
+    #sendBtn {
+      padding: 8px 12px;
+      background: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌐 Global Chat</h1>
+  <div id="chatBox"></div>
+  <input type="text" id="msgInput" placeholder="Type your message...">
+  <button id="sendBtn">Send</button>
+
+  <script>
+    const binId = "68c2dff6d0ea881f407a6e52"; // replace with your Bin ID
+    const secretKey = "$2a$10$5TyPwxtO8pS6G5qBROpTx.PX3NTZx3bg/W6cnelH2J5Qzyfz27ZA."; // replace with your Master Key
+
+    let username = localStorage.getItem("chatUsername");
+
+    // Ask username once
+    async function setUsername() {
+      while (!username) {
+        let name = prompt("Set your username (text only, no emojis):");
+        if (name && /^[a-zA-Z0-9_]{3,20}$/.test(name)) {
+          username = name;
+          localStorage.setItem("chatUsername", username);
+          await systemMessage(`${username} joined the chat.`);
+        } else {
+          alert("Invalid username. Use 3–20 letters/numbers only.");
+        }
+      }
+    }
+
+    // Bad words filter
+    const badWords = ["fuck","nigga","nigger","dick","rape","pussy","sybu","bitch","asshole","slut","cock","shit","bastard","whore","fag","cunt","motherfucker","retard","cum","porn"];
+    
+    function containsBadWord(text) {
+      const lower = text.toLowerCase();
+      return badWords.some(word => lower.includes(word));
+    }
+
+    // Fetch chat messages
+    async function loadChat() {
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+          headers: { "X-Master-Key": secretKey }
+        });
+        const data = await res.json();
+        const messages = data.record || [];
+
+        const chatBox = document.getElementById("chatBox");
+        chatBox.innerHTML = "";
+        messages.forEach(msg => {
+          const div = document.createElement("div");
+          div.className = "message " + (msg.system ? "system" : "user");
+          div.textContent = (msg.system ? "" : msg.user + ": ") + msg.text;
+          chatBox.appendChild(div);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (e) {
+        console.error("Load error", e);
+      }
+    }
+
+    // Save message
+    async function sendMessage(text, user = username, system = false) {
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+          headers: { "X-Master-Key": secretKey }
+        });
+        const data = await res.json();
+        const messages = data.record || [];
+
+        messages.push({ user, text, system, time: Date.now() });
+
+        await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Master-Key": secretKey
+          },
+          body: JSON.stringify(messages)
+        });
+        loadChat();
+      } catch (e) {
+        console.error("Send error", e);
+      }
+    }
+
+    async function systemMessage(text) {
+      await sendMessage(text, "Moderation", true);
+    }
+
+    // Auto delete every hour
+    async function autoDelete() {
+      await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Master-Key": secretKey
+        },
+        body: JSON.stringify([])
+      });
+      await systemMessage("All messages are deleted for privacy. Next deletion in one hour.");
+      loadChat();
+    }
+    setInterval(autoDelete, 60 * 60 * 1000); // 1 hour
+
+    // Send button
+    document.getElementById("sendBtn").onclick = async () => {
+      const input = document.getElementById("msgInput");
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      if (containsBadWord(msg)) {
+        await systemMessage("Hey, want banned? This is not your father's chat. Mind your language.");
+      } else {
+        await sendMessage(msg);
+      }
+
+      input.value = "";
+    };
+
+    // Init
+    (async () => {
+      await setUsername();
+      await loadChat();
+      setInterval(loadChat, 3000); // auto refresh every 3 sec
+    })();
+  </script>
+</body>
+</html>

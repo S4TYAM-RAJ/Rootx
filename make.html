@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Register - Hack Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+      Create New Account
+    </h2>
+    <input class="w-full border px-3 py-2 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+           id="usernameInput" placeholder="Choose a username" type="text"/>
+    
+    <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700" id="registerBtn">
+      Register
+    </button>
+
+    <p class="mt-3 text-sm text-gray-600">
+      Already have an account?
+      <a class="text-blue-600 underline" href="shop.html">Login</a>
+    </p>
+
+    <p class="mt-3 text-red-600 text-sm" id="statusMessage"></p>
+    <p class="mt-3 text-green-600 text-sm" id="successMessage"></p>
+  </div>
+
+  <script>
+    const BIN_ID = "689860dfae596e708fc68e5c";
+    const MASTER_KEY = "$2a$10$5TyPwxtO8pS6G5qBROpTx.PX3NTZx3bg/W6cnelH2J5Qzyfz27ZA.";
+
+    async function fetchUsersFromBin() {
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+          headers: { "X-Master-Key": MASTER_KEY }
+        });
+        const data = await res.json();
+        return data.record.users || [];
+      } catch (e) {
+        console.error("Failed to load user data:", e);
+        return [];
+      }
+    }
+
+    async function saveUsersToBin(users) {
+      return fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Master-Key": MASTER_KEY,
+          "X-Bin-Private": "false"
+        },
+        body: JSON.stringify({ users })
+      });
+    }
+
+    document.getElementById("registerBtn").addEventListener("click", async () => {
+      const username = document.getElementById("usernameInput").value.trim();
+      const statusMsg = document.getElementById("statusMessage");
+      const successMsg = document.getElementById("successMessage");
+
+      statusMsg.textContent = "";
+      successMsg.textContent = "";
+
+      if (!username) {
+        statusMsg.textContent = "Please enter a username.";
+        return;
+      }
+
+      let users = await fetchUsersFromBin();
+      if (users.find(u => u.username === username)) {
+        statusMsg.textContent = "Username already exists.";
+        return;
+      }
+
+      // New user with default balance = 20
+      const newUser = { username, balance: 20 };
+      users.push(newUser);
+      await saveUsersToBin(users);
+
+      successMsg.textContent = "Account created successfully! You can now login.";
+      document.getElementById("usernameInput").value = "";
+    });
+  </script>
+</body>
+</html>

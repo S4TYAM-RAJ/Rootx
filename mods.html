@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ROOTX FREE MODS</title>
+  <style>
+    body {
+      background: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 10px;
+      text-align: center;
+      color: #000;
+    }
+
+    p.intro {
+      text-align: center;
+      color: #444;
+      margin-bottom: 25px;
+    }
+
+    .mod {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .mod span {
+      font-size: 15px;
+      font-weight: bold;
+      color: #000;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      background: #007BFF;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    .btn:hover { background: #0056b3; }
+
+    footer {
+      margin: 30px 0;
+      font-size: 16px;
+      font-weight: bold;
+      color: #000;
+      text-align: center;
+    }
+
+    /* Ad Popup */
+    .ad-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .ad-overlay.show {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .ad-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 14px;
+      text-align: center;
+      width: 250px;
+      height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      animation: fadeInUp 0.4s ease;
+    }
+
+    .ad-box img {
+      max-width: 100%;
+      max-height: 120px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      object-fit: cover;
+    }
+
+    .ad-box h2 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #000;
+    }
+
+    .ad-buttons {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .ad-buttons button {
+      flex: 1;
+      margin: 0 5px;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .visit-btn { background: #28a745; color: #fff; }
+    .visit-btn:hover { background: #218838; }
+
+    .skip-btn { background: #888; color: #fff; }
+    .skip-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+    @keyframes fadeInUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Rootx Free Mods</h1>
+  <p class="intro">Made by millions but only provided here wtf</p>
+
+  <div class="mod"><span>OTT App Mods</span><a class="btn" href="https://t.me/+1Gw19wo3pT5kNzBl" target="_blank">Join</a></div>
+  <div class="mod"><span>Music App Mods</span><a class="btn" href="https://t.me/+1Gw19wo3pT5kNzBl" target="_blank">Join</a></div>
+  <div class="mod"><span>Movie App Mods</span><a class="btn" href="https://t.me/+1Gw19wo3pT5kNzBl" target="_blank">Join</a></div>
+  <div class="mod"><span>Games + Apps</span><a class="btn" href="https://t.me/youarefinished_mods" target="_blank">Join</a></div>
+  <div class="mod"><span>All Games</span><a class="btn" href="https://t.me/liteapks" target="_blank">Join</a></div>
+
+  <footer>TEAM ROOTX</footer>
+
+  <!-- Ad Overlay -->
+  <div id="adOverlay" class="ad-overlay">
+    <div class="ad-box">
+      <img src="whatsapp3.png" alt="Ad">
+      <h2>Special Offer join our whatapp channel for more updates</h2>
+      <div class="ad-buttons">
+        <button class="visit-btn" onclick="visitAd()">Visit</button>
+        <button id="skipBtn" class="skip-btn" disabled>Skip (5)</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const adOverlay = document.getElementById("adOverlay");
+    const skipBtn = document.getElementById("skipBtn");
+    let skipCountdown;
+
+    function showAd() {
+      adOverlay.classList.add("show");
+      let timeLeft = 5;
+      skipBtn.textContent = "Skip (" + timeLeft + ")";
+      skipBtn.disabled = true;
+
+      skipCountdown = setInterval(() => {
+        timeLeft--;
+        skipBtn.textContent = "Skip (" + timeLeft + ")";
+        if (timeLeft <= 0) {
+          clearInterval(skipCountdown);
+          skipBtn.textContent = "Skip";
+          skipBtn.disabled = false;
+          skipBtn.onclick = () => hideAd();
+        }
+      }, 1000);
+    }
+
+    function hideAd() {
+      adOverlay.classList.remove("show");
+    }
+
+    function visitAd() {
+      window.open("https://whatsapp.com/channel/0029VbB1gWpK5cD7vD1WuF1b", "_blank");
+      hideAd();
+    }
+
+    // Show first ad immediately
+    window.onload = () => {
+      showAd();
+      // Then every 2 minutes (120000 ms)
+      setInterval(showAd, 120000);
+    };
+  </script>
+</body>
+</html>

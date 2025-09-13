@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NGS1 User List</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8fbff;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h2 {
+      color: #007bff;
+      margin-bottom: 20px;
+    }
+    .user-box {
+      display: inline-block;
+      border: 2px solid #007bff;
+      border-radius: 10px;
+      padding: 12px 20px;
+      margin: 10px;
+      min-width: 180px;
+      background: #fff;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.05);
+      text-align: left;
+    }
+    .username {
+      font-weight: bold;
+      font-size: 16px;
+      color: #007bff;
+      margin-bottom: 6px;
+    }
+    .country {
+      font-size: 14px;
+      color: #000;
+      margin-bottom: 4px;
+    }
+    .date {
+      font-size: 12px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h2>ROOTX User List</h2>
+  <div id="userList"></div>
+
+<script>
+const API_KEY = "$2a$10$5TyPwxtO8pS6G5qBROpTx.PX3NTZx3bg/W6cnelH2J5Qzyfz27ZA.";
+const BIN_ID = "68c0db7843b1c97be93d3001";
+
+async function loadUsers() {
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+      headers: { "X-Master-Key": API_KEY }
+    });
+    if(!res.ok) throw new Error("Network error " + res.status);
+    const json = await res.json();
+    const users = json.record.users || [];
+    
+    const list = document.getElementById("userList");
+    list.innerHTML = "";
+
+    users.forEach(u => {
+      const box = document.createElement("div");
+      box.className = "user-box";
+
+      box.innerHTML = `
+        <div class="username">${u.username || "Unknown"}</div>
+        <div class="country">🌍 ${u.country || "Unknown"}</div>
+        <div class="date">Joined: ${u.joined || "N/A"}</div>
+      `;
+
+      list.appendChild(box);
+    });
+  } catch(err) {
+    console.error("Error loading users:", err);
+  }
+}
+
+// Load on page start + refresh every 10s
+loadUsers();
+setInterval(loadUsers, 10000);
+</script>
+</body>
+</html>

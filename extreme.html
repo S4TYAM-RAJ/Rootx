@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EXTREME BOMBERS — ROOTX</title>
+  <style>
+    :root{
+      --blue:#007bff;
+      --blue-dark:#0056b3;
+      --bg:#f6fbff;
+      --card:#ffffff;
+      --text:#04243a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      padding:28px;
+      display:flex;
+      justify-content:center;
+    }
+    .container{ width:100%; max-width:720px; }
+    header{ margin-bottom:18px; display:flex;justify-content:space-between;align-items:center;}
+    header h1{ margin:0; color:var(--blue-dark); font-size:20px; }
+    .card{
+      background:var(--card);
+      border-radius:10px;
+      padding:18px;
+      box-shadow:0 8px 20px rgba(2,44,89,0.06);
+      border-left:8px solid var(--blue);
+    }
+    .list{ list-style:none; padding:0; margin:0; display:grid; gap:12px; }
+    .item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px;
+      border-radius:8px;
+      background:#fff;
+      border:1px solid rgba(0,123,255,0.08);
+    }
+    .left{ display:flex; align-items:center; gap:12px; }
+    .num{
+      width:40px; height:40px; display:flex;align-items:center;justify-content:center;
+      border-radius:8px; background:linear-gradient(180deg,var(--blue) 0%, var(--blue-dark) 100%);
+      color:#fff; font-weight:800;
+    }
+    .title{ font-weight:700; color:var(--blue-dark); }
+    .btn{
+      padding:9px 14px;
+      border-radius:8px;
+      background:var(--blue);
+      color:#fff;
+      text-decoration:none;
+      font-weight:700;
+      border: none;
+      display:inline-block;
+    }
+    @media (max-width:560px){
+      .item{ flex-direction:column; align-items:flex-start; }
+      .btn{ width:100%; text-align:center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>EXTREME BOMBERS</h1>
+      <div style="color:var(--blue);font-weight:700">ROOTX</div>
+    </header>
+
+    <div class="card" role="main" aria-label="Extreme downloads">
+      <ul class="list">
+        <li class="item">
+          <div class="left">
+            <div class="num">1</div>
+            <div>
+              <div class="title">BOMBER 1</div>
+              <div style="font-size:13px;color:#2b587a">Quick download</div>
+            </div>
+          </div>
+          <a class="btn" href="https://www.mediafire.com/file/md0v5z95u6iwmnj/KILLNET_1.0.apk/file" target="_blank" rel="noopener">Download</a>
+        </li>
+
+        <li class="item">
+          <div class="left">
+            <div class="num">2</div>
+            <div>
+              <div class="title">BOMBER 2</div>
+              <div style="font-size:13px;color:#2b587a">Quick download</div>
+            </div>
+          </div>
+          <a class="btn" href="https://www.mediafire.com/file/ytj4yvgsgqoiwfn/Call+Bomber+-+Free+Call+Bombing+Service+2025_1.apk/file" target="_blank" rel="noopener">Download</a>
+        </li>
+
+        <li class="item">
+          <div class="left">
+            <div class="num">3</div>
+            <div>
+              <div class="title">BOMBER 3</div>
+              <div style="font-size:13px;color:#2b587a">Quick download</div>
+            </div>
+          </div>
+          <a class="btn" href="https://www.mediafire.com/file/1ydh82cbfe1y1o1/CJ7+Vip+Bomber_1.0.apk/file" target="_blank" rel="noopener">Download</a>
+        </li>
+
+        <li class="item">
+          <div class="left">
+            <div class="num"> 4</div>
+            <div>
+              <div class="title">BOMBER 4</div>
+              <div style="font-size:13px;color:#2b587a">Quick download</div>
+            </div>
+          </div>
+          <a class="btn" href="https://www.mediafire.com/file/zjsbrielcxy9xxf/Sms+Bomber+[+DARK+STUFF+]_Join@DARKSTUFF96.apk/file" target="_blank" rel="noopener">Download</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

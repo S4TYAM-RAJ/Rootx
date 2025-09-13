@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ROOTX FREE SCRIPTS</title>
+  <style>
+    body {
+      background: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 10px;
+      text-align: center;
+      color: #000;
+    }
+
+    p.intro {
+      text-align: center;
+      color: #444;
+      margin-bottom: 20px;
+    }
+
+    .script {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .script span {
+      font-size: 14px;
+      font-weight: bold;
+      color: #000;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn {
+      padding: 6px 12px;
+      background: #007BFF;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      border: none;
+      transition: 0.3s;
+    }
+
+    .btn:hover { background: #0056b3; }
+
+    footer {
+      margin: 30px 0;
+      font-size: 16px;
+      font-weight: bold;
+      color: #000;
+      text-align: center;
+    }
+
+    /* Ad popup */
+    #adPopup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #111;
+      color: #fff;
+      width: 280px;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      display: none;
+      z-index: 1000;
+    }
+
+    #adPopup img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    #adPopup h3 {
+      margin: 10px 0;
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .ad-btn {
+      display: inline-block;
+      margin: 5px;
+      padding: 8px 14px;
+      background: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .ad-btn:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h1>ROOTX FREE SCRIPTS</h1>
+  <p class="intro">25 Free Termux scripts provided by Rootx</p>
+
+  <div id="scriptsList"></div>
+
+  <footer>TEAM ROOTX</footer>
+
+  <!-- Ad popup -->
+  <div id="adPopup">
+    <img src="whatsapp3.png" alt="Ad">
+    <h3>Join our WhatsApp channel for latest updates</h3>
+    <a href="https://whatsapp.com/channel/0029VbB1gWpK5cD7vD1WuF1b" target="_blank">
+      <button class="ad-btn">Visit</button>
+    </a>
+    <button id="skipBtn" class="ad-btn" disabled>Skip (5s)</button>
+  </div>
+
+  <script>
+    const scripts = [
+      { name: "Zphisher", code: "git clone https://github.com/htr-tech/zphisher", preview: "Phishing tool package" },
+      { name: "CamPhish", code: "git clone https://github.com/techchipnet/CamPhish", preview: "Hack phone camera" },
+      { name: "HiddenEye", code: "git clone https://github.com/DarkSecDevelopers/HiddenEye", preview: "Phishing toolkit advanced" },
+      { name: "PhoneInfoga", code: "git clone https://github.com/sundowndev/phoneinfoga", preview: "Phone number info" },
+      { name: "TBomb", code: "git clone https://github.com/TheSpeedX/TBomb", preview: "SMS call bomber" },
+      { name: "BruteX", code: "git clone https://github.com/1N3/BruteX", preview: "Brute force tool" },
+      { name: "IP-Tracer", code: "git clone https://github.com/rajkumardusad/IP-Tracer", preview: "Trace IP location" },
+      { name: "RED_HAWK", code: "git clone https://github.com/Tuhinshubhra/RED_HAWK", preview: "Info gathering tool" },
+      { name: "Infoga", code: "git clone https://github.com/m4ll0k/Infoga", preview: "Email OSINT tool" },
+      { name: "Weeman", code: "git clone https://github.com/evait-security/weeman", preview: "Phishing HTTP server" },
+      { name: "Sherlock", code: "git clone https://github.com/sherlock-project/sherlock", preview: "Find usernames online" },
+      { name: "SocialBox", code: "git clone https://github.com/TunisianEagles/SocialBox", preview: "Social brute force" },
+      { name: "LazyScript", code: "git clone https://github.com/arismelachroinos/lscript", preview: "Hacking script pack" },
+      { name: "XAttacker", code: "git clone https://github.com/Moham3dRiahi/XAttacker", preview: "Website auto exploit" },
+      { name: "SET Toolkit", code: "git clone https://github.com/trustedsec/social-engineer-toolkit", preview: "Social engineering kit" },
+      { name: "Cupp", code: "git clone https://github.com/Mebus/cupp", preview: "Wordlist generator tool" },
+      { name: "XSStrike", code: "git clone https://github.com/s0md3v/XSStrike", preview: "XSS detection tool" },
+      { name: "AngryFuzzer", code: "git clone https://github.com/ihebski/angryFuzzer", preview: "Fuzzer for websites" },
+      { name: "KnockMail", code: "git clone https://github.com/4w4k3/KnockMail", preview: "Check mail validity" },
+      { name: "Hash-Buster", code: "git clone https://github.com/UltimateHackers/Hash-Buster", preview: "Crack hash fast" },
+      { name: "Dirsearch", code: "git clone https://github.com/maurosoria/dirsearch", preview: "Directory brute force" },
+      { name: "Nmap Automator", code: "git clone https://github.com/21y4d/nmapAutomator", preview: "Auto nmap scans" },
+      { name: "Routersploit", code: "git clone https://github.com/threat9/routersploit", preview: "Router exploit kit" },
+      { name: "Seeker", code: "git clone https://github.com/thewhiteh4t/seeker", preview: "GPS location grabber" },
+      { name: "Tool-X", code: "git clone https://github.com/rajkumardusad/Tool-X", preview: "Install 370+ tools" }
+    ];
+
+    const listDiv = document.getElementById("scriptsList");
+
+    scripts.forEach(script => {
+      const div = document.createElement("div");
+      div.className = "script";
+
+      const name = document.createElement("span");
+      name.textContent = script.name;
+
+      const btn = document.createElement("button");
+      btn.className = "btn";
+      btn.textContent = "Copy";
+      btn.onclick = () => {
+        navigator.clipboard.writeText(script.code);
+        alert("Copied: " + script.code);
+      };
+
+      const preview = document.createElement("span");
+      preview.textContent = script.preview;
+
+      div.appendChild(name);
+      div.appendChild(btn);
+      div.appendChild(preview);
+      listDiv.appendChild(div);
+    });
+
+    // Ad logic
+    const adPopup = document.getElementById("adPopup");
+    const skipBtn = document.getElementById("skipBtn");
+
+    function showAd() {
+      adPopup.style.display = "block";
+      let countdown = 10;
+      skipBtn.textContent = `Skip (${countdown}s)`;
+      skipBtn.disabled = true;
+
+      const timer = setInterval(() => {
+        countdown--;
+        skipBtn.textContent = countdown > 0 ? `Skip (${countdown}s)` : "Skip";
+        if (countdown <= 0) {
+          skipBtn.disabled = false;
+          clearInterval(timer);
+        }
+      }, 1000);
+    }
+
+    skipBtn.addEventListener("click", () => {
+      adPopup.style.display = "none";
+    });
+
+    // First ad after 10 seconds
+    setTimeout(showAd, 1000);
+
+    // Then every 2 minutes
+    setInterval(showAd, 120000);
+  </script>
+</body>
+</html>

