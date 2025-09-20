@@ -7,7 +7,7 @@
   <style>
     body {
       margin: 0;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -19,7 +19,7 @@
     /* Header */
     .header {
       text-align: center;
-      margin-top: 30px;
+      margin-top: 20px;
     }
     .header h1 {
       font-size: 28px;
@@ -38,7 +38,6 @@
       height: 220px;
       perspective: 1000px;
     }
-
     .card-inner {
       position: relative;
       width: 100%;
@@ -46,11 +45,9 @@
       transition: transform 0.8s ease-in-out;
       transform-style: preserve-3d;
     }
-
     .card.flipped .card-inner {
       transform: rotateY(180deg);
     }
-
     .front, .back {
       position: absolute;
       width: 100%;
@@ -66,16 +63,13 @@
       padding: 15px;
       box-sizing: border-box;
     }
-
     .back {
       transform: rotateY(180deg);
     }
-
     .front h2, .back h2 {
       color: #003366;
       margin-bottom: 10px;
     }
-
     .front button, .back button {
       width: 120px;
       padding: 10px;
@@ -87,39 +81,56 @@
       cursor: pointer;
       margin-bottom: 10px;
     }
-
     .front button:hover, .back button:hover {
       background: #0056b3;
     }
-
     .flip-link {
       font-size: 13px;
       color: #007bff;
       cursor: pointer;
       text-decoration: underline;
     }
-
     .flip-link:hover {
       color: #0056b3;
+    }
+
+    /* Ad sections */
+    .ad-container {
+      width: 100%;
+      text-align: center;
+      margin: 10px 0;
     }
 
     /* Footer */
     .footer {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       color: #222;
       font-size: 14px;
     }
-
     .sub-footer {
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
       color: #555;
       font-size: 12px;
     }
   </style>
 </head>
 <body>
+  <!-- Top Ad -->
+  <div class="ad-container" id="ad-top">
+    <!-- AdMob Top Banner -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=YOUR_PB_ID"
+      crossorigin="anonymous"></script>
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="YOUR_PB_ID"
+      data-ad-slot="YOUR_UNIT_ID"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
   <!-- Title + Subtitle -->
   <div class="header">
     <h1>ROOTX BASE</h1>
@@ -135,7 +146,6 @@
         <button onclick="window.location.href='register.html'">Enter</button>
         <span class="flip-link" onclick="flipCard()">Click here to Login</span>
       </div>
-
       <!-- Back = Login -->
       <div class="back">
         <h2>Login</h2>
@@ -145,17 +155,29 @@
     </div>
   </div>
 
+  <!-- Bottom Ad -->
+  <div class="ad-container" id="ad-bottom">
+    <!-- AdMob Bottom Banner -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=YOUR_PB_ID"
+      crossorigin="anonymous"></script>
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="YOUR_PB_ID"
+      data-ad-slot="YOUR_UNIT_ID"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
   <!-- Footer -->
   <div class="footer">⚠ New users must register. Verification takes up to 10 minutes.</div>
-  <div class="sub-footer">©ROOTX  | Authorized Access Only</div>
+  <div class="sub-footer">©ROOTX | Authorized Access Only</div>
 
   <script>
     const card = document.getElementById("card");
-
     function flipCard() {
       card.classList.toggle("flipped");
     }
-
     card.addEventListener("click", (e) => {
       if (e.target.tagName.toLowerCase() === "button" || e.target.classList.contains("flip-link")) return;
       card.classList.toggle("flipped");
